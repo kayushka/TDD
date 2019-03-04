@@ -1,4 +1,4 @@
-from django.urls import resolve
+from django.core.urlresolvers import resolve
 from django.test import TestCase
 from django.http import HttpRequest
 from django.template.loader import render_to_string
@@ -14,6 +14,12 @@ class HomePageTest(TestCase):
 	def test_home_page_returns_correct_html(self):
 		request = HttpRequest()
 		response = home_page(request)
-		expected_html = render_to_string('home.html')
+		expected_html = render_to_string('home.html', request=request)
 		self.assertEqual(response.content.decode(), expected_html)
+
+	def test_can_save_a_POST_request(self):
+		response = self.client.post('/', data={'item_text': 'A new list item'})
+		self.assertIn('A new list item', response.content.decode())
+		self.assertTemplateUsed(response, 'home.html')
+
 
